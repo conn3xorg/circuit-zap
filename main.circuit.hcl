@@ -26,8 +26,13 @@ locals {
     dir=${local.results_dir}
     run=$(date -u +%Y%m%dT%H%M%SZ)
     mkdir -p "$dir/$run"
-    # ZAP runs as uid 1000 in its image. The 0700 parent keeps everyone else out.
-    chown 1000:1000 "$dir/$run"
+    # ZAP runs as uid 1000 in its image, so it only gets a directory to write
+    # in, kept apart from where results end up. The 0700 parent keeps everyone
+    # else out.
+    wrk=$dir/.scan-$run
+    mkdir "$wrk"
+    chown 1000:1000 "$wrk"
+    trap 'rm -rf "$wrk"' EXIT
     failed=0
     scan() {
       # Podman's own network with no published ports, never the host's: these
@@ -37,12 +42,14 @@ locals {
       # is what ends any scan that hangs.
       podman run --rm --name "conn3x-zap-$2" --timeout ${var.max_scan_minutes * 60} \
         --cap-drop=all --security-opt=no-new-privileges --security-opt=apparmor=unconfined \
-        -v "$dir/$run:/zap/wrk:rw,Z" \
+        -v "$wrk:/zap/wrk:rw,Z" \
         ${local.image} \
         ${local.scan} -t "$1" -m ${var.spider_minutes} ${local.silent} \
         -J "$2.json" -r "$2.html" -w "$2.md" >> "$dir/$run/$2.log" 2>&1
       # 0 is clean, and 1 and 2 mean it found something. 3 is a failed scan.
       rc=$?
+      # With the container gone, only its plain files move across.
+      find "$wrk" -mindepth 1 -maxdepth 1 -type f -exec mv -t "$dir/$run" {} +
       if [ "$rc" -gt 2 ] || [ ! -s "$dir/$run/$2.json" ]; then
         echo "The scan of $1 failed with exit code $rc." >&2
         tail -n 20 "$dir/$run/$2.log" >&2

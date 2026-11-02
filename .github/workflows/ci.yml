@@ -83,6 +83,14 @@ jobs:
         run: |
           conn3x apply -auto-approve -var active_scan=true
           sudo podman exec -i circuit-zap sh -s http://10.89.0.250:8099/ active < check.sh
+      - name: Check the results stay root's and the scan's own directory is gone
+        run: |
+          sudo podman exec circuit-zap sh -ec '
+            cd /var/lib/conn3x-zap
+            [ "$(stat -L -c "%U" latest)" = root ]
+            [ "$(stat -c "%U" latest/summary.txt)" = root ]
+            [ -z "$(find . -maxdepth 1 -name ".scan-*")" ]
+          '
       - name: Clean up
         if: always()
         working-directory: examples/local
