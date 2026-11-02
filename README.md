@@ -8,7 +8,7 @@ A Conn3x circuit that scans websites you name with [ZAP](https://www.zaproxy.org
 
 ```hcl
 module "zap" {
-  source = "github.com/conn3xorg/circuit-zap?ref=v0.1.0"
+  source = "github.com/conn3xorg/circuit-zap?ref=v0.1.1"
 
   hosts                = { scanner = "203.0.113.10" }
   ssh_private_key_file = "~/.ssh/id_ed25519"
@@ -50,7 +50,7 @@ By default each scan runs `zap-baseline.py`. It spiders the target for up to `sp
 3. Sets up a systemd timer, `conn3x-zap.timer`, that runs the script on `schedule`. The timer is `Persistent`, so a scan missed while the host was off runs soon after it's back.
 4. With `run_now`, scans. It scans again whenever the script changes.
 
-Each scan writes a directory named for its start time in UTC under `/var/lib/conn3x-zap`, and points `latest` at it. Reports are named for their URL, with everything but letters and digits as `_`:
+Each scan writes to a directory of its own while it runs, then moves the reports to a root-owned directory named for its start time in UTC under `/var/lib/conn3x-zap`, and points `latest` at it. Reports are named for their URL, with everything but letters and digits as `_`:
 
 | File | What it is |
 | --- | --- |
