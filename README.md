@@ -10,7 +10,7 @@ A Conn3x circuit that scans websites you name with [ZAP](https://www.zaproxy.org
 
 ```hcl
 module "zap" {
-  source = "github.com/conn3xorg/circuit-zap?ref=v0.1.1"
+  source = "github.com/conn3xorg/circuit-zap?ref=v0.1.2"
 
   hosts                = { scanner = "203.0.113.10" }
   ssh_private_key_file = "~/.ssh/id_ed25519"
