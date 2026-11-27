@@ -126,10 +126,13 @@ circuit "zap" {
     }
   }
 
+  # A start of the timer's oneshot service waits for the scan to finish and
+  # fails the apply if it fails.
   step "scan" {
     for_each = toset(var.run_now ? ["scan"] : [])
-    command {
-      command  = "systemctl start ${local.unit}.service"
+    service_action {
+      name     = "${local.unit}.service"
+      action   = "start"
       triggers = { script = conn3x_file.zap__script[each.key].revision }
     }
   }

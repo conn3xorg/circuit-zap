@@ -10,7 +10,7 @@ A Conn3x circuit that scans websites you name with [ZAP](https://www.zaproxy.org
 
 ```hcl
 module "zap" {
-  source = "github.com/conn3xorg/circuit-zap?ref=v0.1.3"
+  source = "github.com/conn3xorg/circuit-zap?ref=v0.2.0"
 
   hosts                = { scanner = "203.0.113.10" }
   ssh_private_key_file = "~/.ssh/id_ed25519"
@@ -127,7 +127,7 @@ Left alone, ZAP's scripts fetch newer add-ons and beta rules from the internet e
 
 ## Requirements
 
-Requires Conn3x v0.6.10 or later and systemd on each host. Hosts need to reach their package mirror, `ghcr.io` and your targets. The image takes 2.5 GB on disk. Hosts with 2 GB of memory ran it without trouble against a one-page site; a large site will want more.
+Requires Conn3x v0.37.0 or later and systemd on each host. Hosts need to reach their package mirror, `ghcr.io` and your targets. The image takes 2.5 GB on disk. Hosts with 2 GB of memory ran it without trouble against a one-page site; a large site will want more.
 
 ## Tested on
 
